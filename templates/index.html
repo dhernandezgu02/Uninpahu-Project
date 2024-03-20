@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Calcular Ruta</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      .container {
+        max-width: 600px;
+        margin: 20px auto;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+
+      h1 {
+        text-align: center;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 5px;
+      }
+
+      select {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 15px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+      }
+
+      button {
+        display: block;
+        width: 100%;
+        padding: 10px;
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+
+      button:hover {
+        background-color: #0056b3;
+      }
+
+      #resultado {
+        margin-top: 20px;
+        padding: 10px;
+        border-radius: 5px;
+        background-color: #f0f0f0;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Calcular Ruta</h1>
+    <div>
+      <label for="origen">Origen:</label>
+      <select id="origen">
+        <option value="">Seleccione una opcion</option>
+        <option value="MAIN_BUILDING_MAIN_ENTRANCE">Sede Principal</option>
+        <option value="OTHER_BUILDING_MAIN_ENTRANCE">
+          Sede frente principal
+        </option>
+        <option value="STREETS_CARRERA_16_40A">CARRERA 16 40A</option>
+        <option value="ADMINISTRATIVE_BUILDING_MAIN_ENTRANCE">
+          Sede Administrativa
+        </option>
+        <!-- <option value="STREETS_MULKY_STUDIO">STREETS_MULKY_STUDIO</option> -->
+        <!-- <option value="STREETS_CALLE_40_18">CALLE 40 18</option>
+            <option value="STREETS_CALLE_40_18A">CALLE 40 18A</option> -->
+        <option value="LIBRARY_BUILDING_MAIN_ENTRANCE">Biblioteca</option>
+        <!-- <option value="MAIN_BUILDING_CLASROOM_8_104">MAIN_BUILDING_CLASROOM_8_104</option> -->
+        <!-- <option value="MAIN_BUILDING_N1_1">MAIN_BUILDING_N1_1</option>
+            <option value="MAIN_BUILDING_N1_2">MAIN_BUILDING_N1_2</option>
+            <option value="MAIN_BUILDING_N1_3">MAIN_BUILDING_N1_3</option> -->
+        <!-- <option value="MAIN_BUILDING_STAIRS_1">MAIN_BUILDING_STAIRS_1</option> -->
+      </select>
+    </div>
+    <div>
+      <label for="destino">Destino:</label>
+      <select id="destino">
+        <option value="">Seleccione una opcion</option>
+        <option value="MAIN_BUILDING_MAIN_ENTRANCE">Sede Principal</option>
+        <option value="OTHER_BUILDING_MAIN_ENTRANCE">
+          Sede frente principal
+        </option>
+        <option value="STREETS_CARRERA_16_40A">CARRERA 16 40A</option>
+        <option value="ADMINISTRATIVE_BUILDING_MAIN_ENTRANCE">
+          Sede Administrativa
+        </option>
+        <!-- <option value="STREETS_MULKY_STUDIO">STREETS_MULKY_STUDIO</option> -->
+        <!-- <option value="STREETS_CALLE_40_18">CALLE 40 18</option>
+            <option value="STREETS_CALLE_40_18A">CALLE 40 18A</option> -->
+        <option value="LIBRARY_BUILDING_MAIN_ENTRANCE">Biblioteca</option>
+        <!-- <option value="MAIN_BUILDING_CLASROOM_8_104">MAIN_BUILDING_CLASROOM_8_104</option> -->
+        <!-- <option value="MAIN_BUILDING_N1_1">MAIN_BUILDING_N1_1</option>
+            <option value="MAIN_BUILDING_N1_2">MAIN_BUILDING_N1_2</option>
+            <option value="MAIN_BUILDING_N1_3">MAIN_BUILDING_N1_3</option> -->
+        <!-- <option value="MAIN_BUILDING_STAIRS_1">MAIN_BUILDING_STAIRS_1</option> -->
+      </select>
+    </div>
+    <button onclick="calcularRuta()">Calcular Ruta</button>
+    <div id="resultado"></div>
+    <div id="imagenes-lugares" style="display: none"></div>
+
+    <script>
+      // Objeto de mapeo para traducir nombres de lugares
+      var nombresLegibles = {
+        MAIN_BUILDING_MAIN_ENTRANCE: "Sede Principal",
+        OTHER_BUILDING_MAIN_ENTRANCE: "Otro Edificio Principal",
+        STREETS_CARRERA_16_40A: "Calle Carrera 16 #40A",
+        ADMINISTRATIVE_BUILDING_MAIN_ENTRANCE: "Edificio Administrativo",
+        STREETS_MULKY_STUDIO: "Calle MULKY_STUDIO",
+        STREETS_CALLE_40_18: "CALLE 40 # 18",
+        STREETS_CALLE_40_18A: "CALLE # 40 # 18A",
+        LIBRARY_BUILDING_MAIN_ENTRANCE: "Entrada principal biblioteca",
+        MAIN_BUILDING_CLASROOM_8_104: "Salon 8_104}",
+        MAIN_BUILDING_N1_1: "{MAIN_BUILDING}_{N1_1}",
+        MAIN_BUILDING_N1_2: "{MAIN_BUILDING}_{N1_2}",
+        MAIN_BUILDING_N1_3: "{MAIN_BUILDING}_{N1_3}",
+        MAIN_BUILDING_STAIRS_1: "{MAIN_BUILDING}_{STAIRS_1}",
+      };
+
+      var rutasImagenes = {
+        MAIN_BUILDING_MAIN_ENTRANCE: "/static/img/sede-principal.png",
+        OTHER_BUILDING_MAIN_ENTRANCE: "/static/img/sede-frente-principal.png",
+        STREETS_CARRERA_16_40A: "/static/img/carrera-16-40a.png",
+        ADMINISTRATIVE_BUILDING_MAIN_ENTRANCE: "/static/img/sede-administrativa.png",
+        STREETS_MULKY_STUDIO: "/static/img/mulki-studio.png",
+        STREETS_CALLE_40_18: "/static/img/calle-40-18.png",
+        STREETS_CALLE_40_18A: "/static/img/calle-40-18a.png",
+        LIBRARY_BUILDING_MAIN_ENTRANCE: "/static/img/biblioteca.png",
+        MAIN_BUILDING_CLASROOM_8_104: "/static/img/carrera-16-40a.png",
+        MAIN_BUILDING_N1_1: "/static/img/carrera-16-40a.png",
+        MAIN_BUILDING_N1_2: "/static/img/carrera-16-40a.png",
+        MAIN_BUILDING_N1_3: "/static/img/carrera-16-40a.png",
+        MAIN_BUILDING_STAIRS_1: "/static/img/carrera-16-40a.png",
+      };
+
+      function mostrarImagenesRuta(ruta) {
+        var imagenesLugares = document.getElementById("imagenes-lugares");
+        imagenesLugares.innerHTML = "";
+
+        ruta.forEach((lugar) => {
+          var rutaImagen = rutasImagenes[lugar];
+          if (rutaImagen) {
+            var imagen = document.createElement("img");
+            imagen.src = rutaImagen;
+            imagen.alt = lugar;
+            imagen.classList.add("imagen-lugar");
+            imagenesLugares.appendChild(imagen);
+          }
+        });
+
+        imagenesLugares.style.display = "block";
+      }
+
+      function calcularRuta() {
+        var origen = document.getElementById("origen").value;
+        var destino = document.getElementById("destino").value;
+
+        // Verificar si se han seleccionado tanto el origen como el destino
+        if (!origen || !destino) {
+          alert("Por favor, seleccione tanto el origen como el destino.");
+          return; // Salir de la función si falta alguna selección
+        }
+
+        var data = {
+          origen: origen,
+          destino: destino,
+        };
+
+        fetch("/calcular_ruta", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.error) {
+              document.getElementById("resultado").innerText = data.error;
+            } else {
+              var rutaLegible = data.ruta_mas_corta
+                .map((lugar) => nombresLegibles[lugar])
+                .join(" -> ");
+              document.getElementById("resultado").innerText =
+                "Ruta más corta: " + rutaLegible;
+
+              mostrarImagenesRuta(data.ruta_mas_corta);
+            }
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+          });
+      }
+    </script>
+  </body>
+</html>
