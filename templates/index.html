@@ -7,47 +7,57 @@
     <style>
       body {
         font-family: Arial, sans-serif;
-        background-color: #f4f4f4;
+        background-color:#1f1f1f; /* Cambiar a un color oscuro */
+        color: #fff; /* Cambiar el color del texto a claro para mayor contraste */
         margin: 0;
         padding: 0;
         box-sizing: border-box;
       }
 
-      .container {
-        max-width: 600px;
-        margin: 20px auto;
-        padding: 20px;
-        background-color: #fff;
-        border-radius: 5px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-      }
-
-      h1 {
+      .logo {
         text-align: center;
+        padding: 20px;
       }
 
-      label {
+      .logo img {
+        max-width: 100%;
+        height: auto;
+      }
+
+      .container-total {
+        margin: auto;
+        width: 80%; /* Ancho del contenedor total */
+
+      }
+
+      .input-container {
+        margin-bottom: 15px;
+      }
+
+      .input-container label {
         display: block;
         margin-bottom: 5px;
       }
 
-      select {
+      .input-container select {
         width: 100%;
-        padding: 10px;
-        margin-bottom: 15px;
+        padding: 15px;
         border: 1px solid #ccc;
         border-radius: 5px;
+        box-sizing: border-box;
+        font-size: 16px; /* Tamaño de fuente */
       }
 
       button {
         display: block;
         width: 100%;
-        padding: 10px;
+        padding: 15px;
         background-color: #007bff;
         color: #fff;
         border: none;
         border-radius: 5px;
         cursor: pointer;
+        font-size: 16px; /* Tamaño de fuente */
       }
 
       button:hover {
@@ -55,16 +65,33 @@
       }
 
       #resultado {
-        margin-top: 20px;
-        padding: 10px;
+        /* margin-top: 20px; */
+        margin: auto;
+        width: 80%;
+        height: 40%;
+        padding: 20px;
         border-radius: 5px;
-        background-color: #f0f0f0;
+        background-color: #333; /* Cambiar el color de fondo del resultado */
       }
+
+      #imagenes-lugares {
+        display: none;
+      }
+      
+      .a-enter-vr-button{
+        margin: auto;
+      }
+  
+
     </style>
   </head>
   <body>
-    <h1>Calcular Ruta</h1>
-    <div>
+    <div class="container-total">
+    <div class="logo">
+      <img src="https://uninpahu.edu.co/wp-content/uploads/2024/01/uninpahu-4.png" alt="Logo de la Universidad">
+    </div>
+    <h1 style="display: flex;">Ruta</h1>
+    <div class="input-container">
       <label for="origen">Origen:</label>
       <select id="origen">
         <option value="">Seleccione una opcion</option>
@@ -87,7 +114,7 @@
         <!-- <option value="MAIN_BUILDING_STAIRS_1">MAIN_BUILDING_STAIRS_1</option> -->
       </select>
     </div>
-    <div>
+    <div class="input-container">
       <label for="destino">Destino:</label>
       <select id="destino">
         <option value="">Seleccione una opcion</option>
@@ -113,7 +140,7 @@
     <button onclick="calcularRuta()">Calcular Ruta</button>
     <div id="resultado"></div>
     <div id="imagenes-lugares" style="display: none"></div>
-
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
     <script>
       // Objeto de mapeo para traducir nombres de lugares
       var nombresLegibles = {
@@ -133,10 +160,10 @@
       };
 
       var rutasImagenes = {
-        MAIN_BUILDING_MAIN_ENTRANCE: "/static/img/sede-principal.png",
-        OTHER_BUILDING_MAIN_ENTRANCE: "/static/img/sede-frente-principal.png",
-        STREETS_CARRERA_16_40A: "/static/img/carrera-16-40a.png",
-        ADMINISTRATIVE_BUILDING_MAIN_ENTRANCE: "/static/img/sede-administrativa.png",
+        MAIN_BUILDING_MAIN_ENTRANCE: "/static/img/sede-principal.jpeg",
+        OTHER_BUILDING_MAIN_ENTRANCE: "/static/img/sede-frente-principal.jpeg",
+        STREETS_CARRERA_16_40A: "/static/img/carrera-16-40a.jpeg",
+        ADMINISTRATIVE_BUILDING_MAIN_ENTRANCE: "/static/img/sede-administrativa.jpeg",
         STREETS_MULKY_STUDIO: "/static/img/mulki-studio.png",
         STREETS_CALLE_40_18: "/static/img/calle-40-18.png",
         STREETS_CALLE_40_18A: "/static/img/calle-40-18a.png",
@@ -149,31 +176,34 @@
       };
 
       function mostrarImagenesRuta(ruta) {
-        var imagenesLugares = document.getElementById("imagenes-lugares");
-        imagenesLugares.innerHTML = "";
+      var imagenesLugares = document.getElementById("imagenes-lugares");
+      imagenesLugares.innerHTML = "";
 
-        ruta.forEach((lugar) => {
-          var rutaImagen = rutasImagenes[lugar];
-          if (rutaImagen) {
-            var imagen = document.createElement("img");
-            imagen.src = rutaImagen;
-            imagen.alt = lugar;
-            imagen.classList.add("imagen-lugar");
-            imagenesLugares.appendChild(imagen);
-          }
-        });
+      ruta.forEach((lugar) => {
+        var rutaImagen = rutasImagenes[lugar];
+        if (rutaImagen) {
+          var imagen360 = document.createElement("a-scene");
+          imagen360.setAttribute("style", "width: 400px; height: 300px; margin: 0 auto;");
+          var sky = document.createElement("a-sky");
+          sky.setAttribute("src", rutaImagen);
+          sky.setAttribute("rotation", "0 -90 0");
+          imagen360.appendChild(sky);
+          imagenesLugares.appendChild(imagen360);
+        }
+      });
 
-        imagenesLugares.style.display = "block";
-      }
+      imagenesLugares.style.display = "block";
+      // imagenesLugares;
+    }
+
 
       function calcularRuta() {
         var origen = document.getElementById("origen").value;
         var destino = document.getElementById("destino").value;
 
-        // Verificar si se han seleccionado tanto el origen como el destino
         if (!origen || !destino) {
           alert("Por favor, seleccione tanto el origen como el destino.");
-          return; // Salir de la función si falta alguna selección
+          return;
         }
 
         var data = {
@@ -207,5 +237,6 @@
           });
       }
     </script>
+    </div>
   </body>
 </html>
